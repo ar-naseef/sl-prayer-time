@@ -79,16 +79,16 @@ export default function TodayHighlight({ prayerTimes }: TodayHighlightProps) {
           return (
             <div
               key={prayer.name}
-              className={`rounded-xl border transition-all duration-200 p-5 md:p-6 ${
+              className={`border transition-colors duration-200 p-5 md:p-6 ${
                 isCurrentPrayer
-                  ? 'border-primary/40 bg-primary/8 shadow-md'
-                  : 'border-border/50 bg-card hover:border-primary/30 hover:shadow-sm'
+                  ? 'border-primary/60 bg-primary/5'
+                  : 'border-border bg-card hover:border-primary/40'
               }`}
             >
               <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between">
                 {/* Mobile: [icon] [name] [Now] on one row, time below; sm+: icon + (name + time) + Now */}
                 <div className="flex items-center gap-2 sm:gap-4 flex-wrap sm:flex-nowrap">
-                  <div className={`p-2 rounded-lg bg-gradient-to-br ${prayer.color} text-white shadow-sm shrink-0`}>
+                  <div className={`p-2 bg-gradient-to-br ${prayer.color} text-white shrink-0`}>
                     <Icon className="w-3 h-3 sm:w-5 sm:h-5" />
                   </div>
                   <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider sm:hidden">
@@ -126,7 +126,7 @@ export default function TodayHighlight({ prayerTimes }: TodayHighlightProps) {
 
       {/* Column 2: Next prayer in (right side) */}
       {timeUntilNext && (
-        <div className="h-full flex flex-col bg-card border border-primary/20 rounded-xl p-5 md:p-6 shadow-sm">
+        <div className="h-full flex flex-col bg-card border border-primary/20 p-5 md:p-6">
           <div className="flex items-center justify-between gap-3 mb-3">
             <div className="min-w-0">
               <p className="text-muted-foreground text-xs font-medium uppercase tracking-wider mb-1">
@@ -142,8 +142,8 @@ export default function TodayHighlight({ prayerTimes }: TodayHighlightProps) {
             <Clock className="w-10 h-10 text-primary/20 shrink-0" />
           </div>
           {!timeUntilNext.isTomorrow && (
-            <div className="bg-gradient-to-r from-primary/5 to-accent/5 rounded-lg p-4 border border-primary/10">
-              <p className="text-center font-mono text-2xl md:text-3xl text-primary font-bold tracking-tight tabular-nums">
+            <div className="bg-gradient-to-r from-primary/5 to-accent/5 px-4 py-6 border border-primary/10">
+              <p className="text-center font-mono text-3xl md:text-4xl text-primary font-bold tracking-tight tabular-nums">
                 {formatTime(timeUntilNext.seconds)}
               </p>
             </div>

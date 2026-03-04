@@ -40,7 +40,7 @@ export default function MonthlyView({ data, district, month, isCurrentMonth }: M
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-primary/10">
+          <div className="p-2 bg-primary/10">
             <Calendar className="w-5 h-5 text-primary" />
           </div>
           <h3 className="text-2xl font-bold text-foreground">
@@ -50,7 +50,7 @@ export default function MonthlyView({ data, district, month, isCurrentMonth }: M
         {isCurrentMonth && (
           <button
             type="button"
-            className="text-sm font-medium text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary/40 rounded px-3 py-1.5"
+            className="text-sm font-medium text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary/40 px-3 py-1.5"
             onClick={() => {
               tableBodyRef.current?.querySelector(`[data-date="${today}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }}
@@ -61,9 +61,9 @@ export default function MonthlyView({ data, district, month, isCurrentMonth }: M
       </div>
 
       {/* Desktop Table View */}
-      <div className="hidden md:block overflow-x-auto overflow-y-auto max-h-[70vh] rounded-xl border border-border/50 shadow-sm">
-        <table className="w-full text-sm">
-          <thead className="bg-muted border-b border-border/60 sticky top-0 z-10 shadow-[0_1px_0_0_var(--border)]">
+      <div className="hidden md:block overflow-x-auto overflow-y-auto max-h-[70vh] border border-border/50">
+          <table className="w-full text-sm">
+          <thead className="bg-muted border-b border-border/60 sticky top-0 z-10">
             <tr>
               <th className="px-6 py-4 text-left font-semibold text-foreground">Date</th>
               <th className="px-6 py-4 text-center font-semibold text-foreground">Fajr</th>
@@ -88,7 +88,7 @@ export default function MonthlyView({ data, district, month, isCurrentMonth }: M
                 <td className="px-6 py-4 font-semibold text-foreground">
                   <div className="flex items-center gap-3">
                     {isCurrentMonth && prayer.date === today && (
-                      <span className="inline-block w-2.5 h-2.5 bg-primary rounded-full shadow-sm" />
+                      <span className="inline-block w-2.5 h-2.5 bg-primary rounded-full" />
                     )}
                     <span>{prayer.date}</span>
                   </div>
@@ -122,9 +122,9 @@ export default function MonthlyView({ data, district, month, isCurrentMonth }: M
         {data.map((prayer) => (
           <div
             key={prayer.date}
-            className={`border rounded-xl overflow-hidden transition-all duration-200 ${
+            className={`border overflow-hidden transition-colors duration-200 ${
               expandedDates.has(prayer.date)
-                ? 'border-primary/30 bg-primary/8 shadow-sm'
+                ? 'border-primary/30 bg-primary/8'
                 : 'border-border/50 bg-card'
             } ${isCurrentMonth && prayer.date === today ? 'ring-1.5 ring-primary/20' : ''}`}
           >
@@ -135,7 +135,7 @@ export default function MonthlyView({ data, district, month, isCurrentMonth }: M
               <div className="flex items-center gap-4 text-left flex-1">
                 <div className="flex items-center gap-3">
                   {isCurrentMonth && prayer.date === today && (
-                    <span className="inline-block w-2.5 h-2.5 bg-primary rounded-full shadow-sm shrink-0" />
+                    <span className="inline-block w-2.5 h-2.5 bg-primary rounded-full shrink-0" />
                   )}
                   <span className="font-semibold text-foreground min-w-fit">Day {prayer.date}</span>
                 </div>
@@ -178,7 +178,7 @@ function PrayerTimeItem({
 }) {
   return (
     <div
-      className={`rounded-lg p-4 text-center transition-colors ${
+      className={`p-4 text-center transition-colors ${
         highlight
           ? 'bg-primary/12 border border-primary/20 ring-1 ring-primary/10'
           : 'bg-card/50 border border-border/30'

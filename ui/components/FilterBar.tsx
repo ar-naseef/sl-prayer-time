@@ -71,7 +71,7 @@ export default function FilterBar({
   )?.label;
 
   return (
-    <div className="bg-card border border-border/50 rounded-2xl p-6 md:p-8 shadow-sm">
+    <div className="bg-card border border-border/50 p-6 md:p-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* District Selector */}
         <div>
@@ -89,7 +89,7 @@ export default function FilterBar({
                   ? `Location: ${selectedLabel}`
                   : "Choose location"
               }
-              className="w-full min-h-12 px-5 py-3 rounded-xl border border-border/50 bg-background/50 text-foreground hover:border-primary/30 hover:bg-background flex items-center justify-between text-sm font-medium transition-all duration-200"
+              className="w-full min-h-12 px-5 py-3 border border-border/50 bg-background/50 text-foreground hover:border-primary/30 hover:bg-background flex items-center justify-between text-sm font-medium transition-colors duration-200"
             >
               <span className="flex items-center gap-3 min-w-0">
                 <MapPin className="w-4 h-4 text-primary shrink-0" aria-hidden />
@@ -105,7 +105,7 @@ export default function FilterBar({
             {/* Dropdown Menu */}
             {isDistrictOpen && (
               <div
-                className="absolute top-full left-0 right-0 mt-3 bg-card border border-border/50 rounded-xl shadow-lg z-50 animate-in fade-in slide-in-from-top-2 duration-200 overflow-hidden"
+                className="absolute top-full left-0 right-0 mt-3 bg-card border border-border/50 z-50 animate-in fade-in slide-in-from-top-2 duration-200 overflow-hidden"
                 role="listbox"
               >
                 <div className="p-4 border-b border-border/30">
@@ -120,7 +120,7 @@ export default function FilterBar({
                       placeholder="Search districts..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-11 pr-4 py-3 bg-background/50 border border-border/30 rounded-lg text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all"
+                      className="w-full pl-11 pr-4 py-3 bg-background/50 border border-border/30 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors"
                     />
                   </div>
                 </div>
@@ -182,7 +182,7 @@ export default function FilterBar({
               <button
                 type="button"
                 onClick={() => setIsMonthOpen(true)}
-                className="w-full min-h-12 px-5 py-3 rounded-xl border border-border/50 bg-background/50 text-foreground hover:border-primary/30 hover:bg-background flex items-center justify-between text-sm font-medium transition-colors"
+                className="w-full min-h-12 px-5 py-3 border border-border/50 bg-background/50 text-foreground hover:border-primary/30 hover:bg-background flex items-center justify-between text-sm font-medium transition-colors"
                 aria-label="Choose month"
               >
                 <span className="flex items-center gap-3 min-w-0">
@@ -199,7 +199,7 @@ export default function FilterBar({
       {/* Month picker modal */}
       {isMonthOpen && (
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-background/80 backdrop-blur-sm">
-          <div className="w-full max-w-md mx-4 rounded-2xl border border-border bg-card shadow-lg">
+          <div className="w-full max-w-md mx-4 border border-border bg-card">
             <div className="flex items-center justify-between px-4 py-3 border-b border-border/60">
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-primary" />
@@ -210,7 +210,7 @@ export default function FilterBar({
               <button
                 type="button"
                 onClick={() => setIsMonthOpen(false)}
-                className="p-1.5 rounded-md hover:bg-secondary/20 text-muted-foreground"
+                className="p-1.5 hover:bg-secondary/20 text-muted-foreground"
                 aria-label="Close month picker"
               >
                 <X className="w-4 h-4" />
@@ -227,9 +227,9 @@ export default function FilterBar({
                       onMonthChange(index);
                       setIsMonthOpen(false);
                     }}
-                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    className={`px-3 py-2 text-sm font-medium transition-colors ${
                       isActive ?
-                        "bg-primary text-primary-foreground shadow-sm"
+                        "bg-primary text-primary-foreground"
                       : "bg-background/60 border border-border/60 text-foreground hover:border-primary/40 hover:bg-background"
                     }`}
                   >

@@ -48,8 +48,8 @@ export default function Header({ onCopyPrayerTimes, copyEnabled }: HeaderProps) 
           </div>
 
           <div className="flex items-center gap-3 ml-4">
-            <div className="hidden sm:inline-flex items-center gap-3 px-4 py-2 rounded-xl bg-background/80 border border-border/70 shadow-sm">
-              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary">
+            <div className="hidden sm:inline-flex items-center gap-3 px-4 py-2 bg-background/80 border border-border/70">
+              <div className="flex items-center justify-center w-8 h-8 bg-primary/10 text-primary">
                 <Calendar className="w-4 h-4" aria-hidden />
               </div>
               <div className="flex flex-col leading-tight">
@@ -65,7 +65,7 @@ export default function Header({ onCopyPrayerTimes, copyEnabled }: HeaderProps) 
               <button
                 type="button"
                 onClick={onCopyPrayerTimes}
-                className="p-2 rounded-lg bg-secondary/20 hover:bg-secondary/30 transition-colors"
+                className="p-2 bg-secondary/20 hover:bg-secondary/30 transition-colors"
                 aria-label="Copy prayer times for WhatsApp"
                 title="Copy today's prayer times for all regions"
               >
@@ -75,7 +75,7 @@ export default function Header({ onCopyPrayerTimes, copyEnabled }: HeaderProps) 
             <button
               type="button"
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="p-2 rounded-lg bg-secondary/20 hover:bg-secondary/30 transition-colors"
+              className="p-2 bg-secondary/20 hover:bg-secondary/30 transition-colors"
               aria-label="Toggle dark mode"
             >
               {theme === 'dark' ? (

@@ -281,7 +281,7 @@ export default function Home() {
           />
 
           {!selectedDistrict && !isLoading && districts.length > 0 && (
-            <div className="mt-8 rounded-2xl border border-dashed border-border bg-card/30 p-12 text-center">
+            <div className="mt-8 border border-dashed border-border bg-card/30 p-12 text-center">
               <p className="text-muted-foreground text-lg font-medium">
                 Select your location above to see prayer times for your area.
               </p>
@@ -293,10 +293,10 @@ export default function Home() {
 
           {isLoading && (
             <div className="mt-8 space-y-8 animate-pulse">
-              <div className="h-32 rounded-2xl bg-muted/50" />
+              <div className="h-32 bg-muted/50" />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {[1, 2, 3, 4, 5, 6].map((i) => (
-                  <div key={i} className="h-24 rounded-xl bg-muted/40" />
+                  <div key={i} className="h-24 bg-muted/40" />
                 ))}
               </div>
             </div>

@@ -39,7 +39,7 @@ export default function MonthSelector({ months, selectedIndex, onChange }: Month
       <div className="relative group">
         <button
           onClick={() => scroll('left')}
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-20 p-2.5 bg-gradient-to-r from-background via-background to-transparent hover:from-primary/15 transition-colors rounded-r-lg opacity-0 group-hover:opacity-100"
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-20 p-2.5 bg-gradient-to-r from-background via-background to-transparent hover:from-primary/15 transition-colors opacity-0 group-hover:opacity-100"
           aria-label="Scroll months left"
         >
           <ChevronLeft className="w-4 h-4 text-primary" />
@@ -54,9 +54,9 @@ export default function MonthSelector({ months, selectedIndex, onChange }: Month
             <button
               key={month}
               onClick={() => onChange(index)}
-              className={`flex-shrink-0 px-5 py-3 rounded-lg font-medium text-sm transition-all duration-200 whitespace-nowrap ${
+              className={`flex-shrink-0 px-5 py-3 font-medium text-sm transition-colors duration-200 whitespace-nowrap ${
                 selectedIndex === index
-                  ? 'bg-primary text-primary-foreground shadow-md'
+                  ? 'bg-primary text-primary-foreground'
                   : 'bg-card border border-border/50 text-foreground hover:border-primary/30'
               }`}
             >
@@ -67,7 +67,7 @@ export default function MonthSelector({ months, selectedIndex, onChange }: Month
 
         <button
           onClick={() => scroll('right')}
-          className="absolute right-0 top-1/2 -translate-y-1/2 z-20 p-2.5 bg-gradient-to-l from-background via-background to-transparent hover:from-primary/15 transition-colors rounded-l-lg opacity-0 group-hover:opacity-100"
+          className="absolute right-0 top-1/2 -translate-y-1/2 z-20 p-2.5 bg-gradient-to-l from-background via-background to-transparent hover:from-primary/15 transition-colors opacity-0 group-hover:opacity-100"
           aria-label="Scroll months right"
         >
           <ChevronRight className="w-4 h-4 text-primary" />

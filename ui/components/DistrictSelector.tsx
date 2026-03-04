@@ -53,11 +53,11 @@ export default function DistrictSelector({ selected, onChange, isLoading }: Dist
       <div ref={dropdownRef} className="relative">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className={`w-full px-5 py-4 rounded-xl border transition-all duration-200 flex items-center justify-between font-medium ${
+          className={`w-full px-5 py-4 border transition-colors duration-200 flex items-center justify-between font-medium ${
             selected
               ? 'bg-primary/8 border-primary/30 text-foreground'
               : 'bg-card border-border/50 text-muted-foreground hover:border-primary/20'
-          } hover:shadow-sm`}
+          }`}
         >
           <span>{selectedLabel || 'Select Your District'}</span>
           <ChevronDown
@@ -68,7 +68,7 @@ export default function DistrictSelector({ selected, onChange, isLoading }: Dist
         </button>
 
         {isOpen && (
-          <div className="absolute top-full left-0 right-0 mt-3 bg-card border border-border/50 rounded-xl shadow-lg z-50 animate-in fade-in slide-in-from-top-2 duration-200 overflow-hidden">
+            <div className="absolute top-full left-0 right-0 mt-3 bg-card border border-border/50 z-50 animate-in fade-in slide-in-from-top-2 duration-200 overflow-hidden">
             <div className="p-4 border-b border-border/30">
               <div className="relative">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -78,7 +78,7 @@ export default function DistrictSelector({ selected, onChange, isLoading }: Dist
                   placeholder="Search districts..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 bg-background/50 border border-border/30 rounded-lg text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                  className="w-full pl-11 pr-4 py-3 bg-background/50 border border-border/30 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
                 />
               </div>
             </div>
