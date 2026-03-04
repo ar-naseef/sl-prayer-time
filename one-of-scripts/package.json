@@ -1,0 +1,8 @@
+{
+  "name": "prayer-times",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "pdf-parse": "^2.4.5"
+  }
+}
