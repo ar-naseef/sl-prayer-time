@@ -85,54 +85,58 @@ export default function CopyPrayerTimesModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-4xl">
-        <DialogHeader>
-          <DialogTitle>Copy prayer times for WhatsApp</DialogTitle>
-          <DialogDescription>
-            Choose which regions to include. Preview updates as you select.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-2 min-h-0">
-          <div className="flex flex-col gap-1 min-h-0">
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              Regions
-            </span>
-            <div className="grid gap-1 overflow-y-auto max-h-[45vh] pr-1">
-              {districts.map((d) => (
-                <label
-                  key={d.value}
-                  className="flex items-center gap-3 rounded-md border border-transparent hover:bg-muted/50 px-3 py-2 cursor-pointer"
-                >
-                  <Checkbox
-                    checked={selectedSlugs.has(d.value)}
-                    onCheckedChange={() => toggleSlug(d.value)}
-                  />
-                  <span className="text-sm">{d.label}</span>
-                </label>
-              ))}
+      <DialogContent className="max-h-[calc(100dvh-2rem)] p-4 sm:max-w-4xl sm:p-6">
+        <div className="flex max-h-[calc(100dvh-6rem)] flex-col gap-4 overflow-hidden">
+          <DialogHeader className="shrink-0">
+            <DialogTitle>Copy prayer times for WhatsApp</DialogTitle>
+            <DialogDescription>
+              Choose which regions to include. Preview updates as you select.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
+            <div className="grid grid-cols-1 gap-4 py-2 md:grid-cols-2">
+            <div className="flex flex-col gap-1 min-h-0">
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                Regions
+              </span>
+              <div className="grid max-h-[40vh] gap-1 overflow-y-auto pr-1 md:max-h-[45vh]">
+                {districts.map((d) => (
+                  <label
+                    key={d.value}
+                    className="flex cursor-pointer items-center gap-3 rounded-md border border-transparent px-3 py-2 hover:bg-muted/50"
+                  >
+                    <Checkbox
+                      checked={selectedSlugs.has(d.value)}
+                      onCheckedChange={() => toggleSlug(d.value)}
+                    />
+                    <span className="text-sm">{d.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+            <div className="flex min-h-0 flex-col gap-1">
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                Generated text
+              </span>
+              <textarea
+                readOnly
+                value={previewText || "Select regions to see preview."}
+                className="min-h-[40vh] w-full resize-none rounded-md border border-input bg-muted/30 px-3 py-2 font-mono text-sm whitespace-pre-wrap focus:outline-none focus:ring-2 focus:ring-ring md:min-h-[45vh]"
+                spellCheck={false}
+              />
+            </div>
             </div>
           </div>
-          <div className="flex flex-col gap-1 min-h-0">
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-              Generated text
-            </span>
-            <textarea
-              readOnly
-              value={previewText || "Select regions to see preview."}
-              className="flex-1 min-h-[45vh] w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-sm font-mono whitespace-pre-wrap resize-none focus:outline-none focus:ring-2 focus:ring-ring"
-              spellCheck={false}
-            />
-          </div>
-        </div>
-        <DialogFooter>
+          <DialogFooter className="shrink-0">
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Button type="button" onClick={handleCopy}>
-            <Copy className="w-4 h-4 mr-2" />
+            <Copy className="mr-2 h-4 w-4" />
             Copy to clipboard
           </Button>
         </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );
