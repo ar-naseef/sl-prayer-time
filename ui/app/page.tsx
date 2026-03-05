@@ -2,8 +2,9 @@
 
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import CopyPrayerTimesModal from "@/components/CopyPrayerTimesModal";
 import FilterBar from "@/components/FilterBar";
 import TodayHighlight from "@/components/TodayHighlight";
 import MonthlyView from "@/components/MonthlyView";
@@ -49,6 +50,8 @@ const REGION_DISTRICTS: { regionSlug: string; district: string }[] = [
   { regionSlug: "colombo-gampaha-kalutara", district: "Colombo" },
   { regionSlug: "colombo-gampaha-kalutara", district: "Gampaha" },
   { regionSlug: "colombo-gampaha-kalutara", district: "Kalutara" },
+  { regionSlug: "ratnapura-kegalle", district: "Ratnapura" },
+  { regionSlug: "ratnapura-kegalle", district: "Kegalle" },
   { regionSlug: "kandy-matale-nuwara-eliya", district: "Kandy" },
   { regionSlug: "kandy-matale-nuwara-eliya", district: "Matale" },
   { regionSlug: "kandy-matale-nuwara-eliya", district: "Nuwara Eliya" },
@@ -64,8 +67,6 @@ const REGION_DISTRICTS: { regionSlug: string; district: string }[] = [
   { regionSlug: "anuradhapura-polonnaruwa", district: "Polonnaruwa" },
   { regionSlug: "kurunegala", district: "Kurunegala" },
   { regionSlug: "mannar-puttalam", district: "Puttalam" },
-  { regionSlug: "ratnapura-kegalle", district: "Ratnapura" },
-  { regionSlug: "ratnapura-kegalle", district: "Kegalle" },
   { regionSlug: "trincomalee", district: "Trincomalee" },
   { regionSlug: "batticaloa-ampara", district: "Batticaloa" },
   { regionSlug: "batticaloa-ampara", district: "Ampara" },
@@ -96,6 +97,7 @@ export default function Home({
   const [districts, setDistricts] = useState<
     { value: string; label: string }[]
   >([]);
+  const [copyModalOpen, setCopyModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -175,58 +177,50 @@ export default function Home({
     return n + (s[(v - 20) % 10] || s[v] || s[0]);
   };
 
-  const buildPrayerTimesCopyText = useCallback(() => {
-    if (!prayerTimesData || !districts.length) return "";
-    const now = new Date();
-    const monthIdx = now.getMonth();
-    const day = now.getDate();
-    const year = now.getFullYear();
-    const monthName = monthNames[monthIdx];
-    const monthKey = months[monthIdx] as keyof DistrictPrayerTimes;
-    const lines: string[] = [
-      "Prayer Time SL",
-      "",
-      `${monthName} ${year} (${getOrdinal(day)})`,
-      "",
-    ];
-    for (const { value, label } of districts) {
-      const districtData = prayerTimesData[value];
-      if (!districtData) continue;
-      const monthRows = districtData[monthKey];
-      if (!monthRows?.length) continue;
-      const dayRow = monthRows.find((r) => r.date === day);
-      if (!dayRow) continue;
-      lines.push(`*${label}*`);
-      lines.push("");
-      lines.push(`Subah – ${formatTimeForDisplay(dayRow.fajr)}`);
-      lines.push(`Sunrise – ${formatTimeForDisplay(dayRow.sunrise)}`);
-      lines.push(`Luhar – ${formatTimeForDisplay(dayRow.luhr)}`);
-      lines.push(`Asr – ${formatTimeForDisplay(dayRow.asr)}`);
-      lines.push(`Magrib – ${formatTimeForDisplay(dayRow.magrib)}`);
-      lines.push(`Isha – ${formatTimeForDisplay(dayRow.isha)}`);
-      lines.push("");
-    }
-    return lines.join("\n").trimEnd();
-  }, [prayerTimesData, districts]);
-
-  const handleCopyPrayerTimes = useCallback(async () => {
-    const text = buildPrayerTimesCopyText();
-    if (!text) {
-      toast.error("Prayer times not loaded yet");
-      return;
-    }
-    try {
-      await navigator.clipboard.writeText(text);
-      toast.success("Copied to clipboard for WhatsApp");
-    } catch {
-      toast.error("Failed to copy");
-    }
-  }, [buildPrayerTimesCopyText]);
+  const buildPrayerTimesCopyTextForRegions = useCallback(
+    (selectedSlugs: string[]) => {
+      if (!prayerTimesData || !districts.length) return "";
+      const slugSet = new Set(selectedSlugs);
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const monthIdx = tomorrow.getMonth();
+      const day = tomorrow.getDate();
+      const year = tomorrow.getFullYear();
+      const monthName = monthNames[monthIdx];
+      const monthKey = months[monthIdx] as keyof DistrictPrayerTimes;
+      const lines: string[] = [
+        "Prayer Time SL",
+        "",
+        `${monthName} ${year} (${getOrdinal(day)})`,
+        "",
+      ];
+      for (const { value, label } of districts) {
+        if (!slugSet.has(value)) continue;
+        const districtData = prayerTimesData[value];
+        if (!districtData) continue;
+        const monthRows = districtData[monthKey];
+        if (!monthRows?.length) continue;
+        const dayRow = monthRows.find((r) => r.date === day);
+        if (!dayRow) continue;
+        lines.push(`*${label}*`);
+        lines.push("");
+        lines.push(`Subah – ${formatTimeForDisplay(dayRow.fajr)}`);
+        lines.push(`Sunrise – ${formatTimeForDisplay(dayRow.sunrise)}`);
+        lines.push(`Luhar – ${formatTimeForDisplay(dayRow.luhr)}`);
+        lines.push(`Asr – ${formatTimeForDisplay(dayRow.asr)}`);
+        lines.push(`Magrib – ${formatTimeForDisplay(dayRow.magrib)}`);
+        lines.push(`Isha – ${formatTimeForDisplay(dayRow.isha)}`);
+        lines.push("");
+      }
+      return lines.join("\n").trimEnd();
+    },
+    [prayerTimesData, districts]
+  );
 
   return (
-    <div className="min-h-screen bg-background transition-colors duration-300">
-      <main className="relative">
-        <Header onCopyPrayerTimes={handleCopyPrayerTimes} copyEnabled={!!prayerTimesData && districts.length > 0} />
+    <div className="min-h-screen flex flex-col bg-background transition-colors duration-300">
+      <main className="relative flex-1">
+        <Header />
 
         <div className="container mx-auto px-4 py-8 md:py-12 max-w-6xl">
           <FilterBar
@@ -279,6 +273,16 @@ export default function Home({
           )}
         </div>
       </main>
+      <CopyPrayerTimesModal
+        open={copyModalOpen}
+        onOpenChange={setCopyModalOpen}
+        districts={districts}
+        getCopyTextForRegions={buildPrayerTimesCopyTextForRegions}
+      />
+      <Footer
+        onCopyClick={() => setCopyModalOpen(true)}
+        copyEnabled={!!prayerTimesData && districts.length > 0}
+      />
     </div>
   );
 }
