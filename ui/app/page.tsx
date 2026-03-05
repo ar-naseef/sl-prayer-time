@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Header from "@/components/Header";
 import FilterBar from "@/components/FilterBar";
@@ -12,6 +13,10 @@ import type {
   PrayerTime,
 } from "@/data/prayerTimes";
 import { formatTimeForDisplay } from "@/data/prayerTimes";
+import {
+  districtNameToPath,
+  regionToPath,
+} from "@/lib/regions";
 
 const months = [
   "jan",
@@ -132,8 +137,23 @@ function getNearestRegionSlug(lat: number, lng: number): string | null {
   return bestSlug;
 }
 
-export default function Home() {
+const STORAGE_KEY_REGION = "selectedDistrict";
+const STORAGE_KEY_DISTRICT_NAME = "selectedDistrictName";
+
+interface PrayerTimesPageProps {
+  /** Region slug from URL (internal mapping). */
+  initialRegionSlug?: string | null;
+  /** District name for display and URL (e.g. "Kegalle"). */
+  initialDistrictName?: string | null;
+}
+
+export default function Home({
+  initialRegionSlug,
+  initialDistrictName,
+}: PrayerTimesPageProps) {
+  const router = useRouter();
   const [selectedDistrict, setSelectedDistrict] = useState<string>("");
+  const [selectedDistrictName, setSelectedDistrictName] = useState<string>("");
   const [selectedMonthIndex, setSelectedMonthIndex] = useState(
     new Date().getMonth(),
   );
@@ -163,6 +183,71 @@ export default function Home() {
 
     fetchData();
   }, []);
+
+  // Priority 1: URL. Priority 2: localStorage. Priority 3: leave empty.
+  useEffect(() => {
+    if (!districts.length) return;
+    if (initialRegionSlug && initialDistrictName) {
+      const exists = districts.some((d) => d.value === initialRegionSlug);
+      if (exists) {
+        setSelectedDistrict(initialRegionSlug);
+        setSelectedDistrictName(initialDistrictName);
+        return;
+      }
+    }
+    if (selectedDistrict) return;
+    if (typeof window === "undefined") return;
+    const storedRegion = window.localStorage.getItem(STORAGE_KEY_REGION);
+    const storedName =
+      window.localStorage.getItem(STORAGE_KEY_DISTRICT_NAME) ?? "";
+    if (!storedRegion) return;
+    const exists = districts.some((d) => d.value === storedRegion);
+    if (exists) {
+      setSelectedDistrict(storedRegion);
+      setSelectedDistrictName(
+        storedName ||
+          (districts.find((d) => d.value === storedRegion)?.label ?? ""),
+      );
+      router.replace(
+        storedName
+          ? districtNameToPath(storedName)
+          : regionToPath(storedRegion),
+      );
+    }
+  }, [
+    districts,
+    initialRegionSlug,
+    initialDistrictName,
+    selectedDistrict,
+    router,
+  ]);
+
+  const handleDistrictChange = useCallback(
+    (regionValue: string, districtName: string) => {
+      setSelectedDistrict(regionValue);
+      setSelectedDistrictName(districtName);
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem(STORAGE_KEY_REGION, regionValue);
+        window.localStorage.setItem(STORAGE_KEY_DISTRICT_NAME, districtName);
+      }
+      router.push(districtNameToPath(districtName));
+    },
+    [router],
+  );
+
+  // Group regions by district names for the dropdown (region label = group header, district names = options)
+  const groupedDistricts = useMemo(() => {
+    return districts.map((d) => {
+      const names = DISTRICT_COORDS.filter((c) => c.regionSlug === d.value).map(
+        (c) => c.district,
+      );
+      return {
+        value: d.value,
+        label: d.label,
+        districtNames: names.length > 0 ? names : [d.label],
+      };
+    });
+  }, [districts]);
 
   const districtData: DistrictPrayerTimes | null = useMemo(() => {
     if (!selectedDistrict || !prayerTimesData) return null;
@@ -243,8 +328,10 @@ export default function Home() {
         <div className="container mx-auto px-4 py-8 md:py-12 max-w-6xl">
           <FilterBar
             districts={districts}
+            groupedDistricts={groupedDistricts}
             selectedDistrict={selectedDistrict}
-            onDistrictChange={setSelectedDistrict}
+            selectedDistrictName={selectedDistrictName}
+            onDistrictChange={handleDistrictChange}
             selectedMonthIndex={selectedMonthIndex}
             onMonthChange={setSelectedMonthIndex}
             months={monthNames}
