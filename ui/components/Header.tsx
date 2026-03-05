@@ -1,10 +1,11 @@
-'use client';
+"use client";
 
-import { format } from 'date-fns';
-import { Calendar, Moon, Sun } from 'lucide-react';
-import Image from 'next/image';
-import { useTheme } from 'next-themes';
-import { useEffect, useState } from 'react';
+import { format } from "date-fns";
+import { Calendar, Moon, Sun } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 export default function Header() {
   const { theme, setTheme } = useTheme();
@@ -20,25 +21,32 @@ export default function Header() {
     <header className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-border">
       <div className="container mx-auto px-4 py-6 max-w-6xl">
         <div className="flex items-center justify-between">
-          <div className="flex-1 flex items-center gap-3">
-            {/* <Image
-              src="/logo.png"
-              alt="Sri Lanka Prayer Times"
-              width={72}
-              height={72}
-              className="h-14 w-14 md:h-16 md:w-16 shrink-0 object-contain"
-            /> */}
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-primary mb-2">
-                Sri Lanka Prayer Times
-              </h1>
-              <p className="text-muted-foreground text-sm md:text-base">
-                Select your district to view accurate daily prayer times
-              </p>
+          <Link
+            href="/"
+            className="flex items-center gap-2 transition-opacity hover:opacity-90"
+            aria-label="Sri Lanka Prayer Times – Home"
+          >
+            <div className="h-[40px]  shrink-0 md:h-[60px]">
+              <Image
+                src="/logo.png"
+                alt=""
+                width={180}
+                height={60}
+                className="h-full w-auto object-contain"
+                priority
+              />
             </div>
-          </div>
 
-          <div className="flex items-center gap-3 ml-4">
+            <div className="flex flex-col justify-center">
+              <span className="text-base font-bold uppercase tracking-[0.2em] text-primary drop-shadow-sm md:text-2xl leading-none">
+                Srilanka
+              </span>
+              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-primary/90 md:text-base leading-none">
+                Salah Times
+              </span>
+            </div>
+          </Link>
+          <div className="flex items-center gap-3">
             <div className="hidden sm:inline-flex items-center gap-3 px-4 py-2 bg-background/80 border border-border/70">
               <div className="flex items-center justify-center w-8 h-8 bg-primary/10 text-primary">
                 <Calendar className="w-4 h-4" aria-hidden />
@@ -48,21 +56,19 @@ export default function Header() {
                   Today
                 </span>
                 <span className="text-xs md:text-sm font-semibold text-foreground">
-                  {format(new Date(), 'EEEE, MMMM d, yyyy')}
+                  {format(new Date(), "EEEE, MMMM d, yyyy")}
                 </span>
               </div>
             </div>
             <button
               type="button"
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               className="p-2 bg-secondary/20 hover:bg-secondary/30 transition-colors"
               aria-label="Toggle dark mode"
             >
-              {theme === 'dark' ? (
+              {theme === "dark" ?
                 <Sun className="w-5 h-5 text-primary" />
-              ) : (
-                <Moon className="w-5 h-5 text-primary" />
-              )}
+              : <Moon className="w-5 h-5 text-primary" />}
             </button>
           </div>
         </div>
