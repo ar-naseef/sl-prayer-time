@@ -10,7 +10,7 @@ function getBaseUrl(): string {
   if (typeof process.env.VERCEL_URL === "string" && process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL}`;
   }
-  return "https://srilanka-prayer-times.vercel.app";
+  return "https://www.srilankasalahtimes.com";
 }
 
 export const siteConfig = {
