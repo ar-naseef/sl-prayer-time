@@ -77,9 +77,9 @@ export default function MonthlyView({ data, district, month, isCurrentMonth }: M
             </tr>
           </thead>
           <tbody ref={tableBodyRef}>
-            {data.map((prayer, index) => (
+            {data.map((prayer) => (
               <tr
-                key={index}
+                key={prayer.date}
                 data-date={prayer.date}
                 className={`border-b border-border/30 transition-colors last:border-b-0 ${
                   isCurrentMonth && prayer.date === today

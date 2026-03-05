@@ -89,8 +89,18 @@ function transformGroup(groupData: any): DistrictPrayerTimes {
     if (!Array.isArray(days)) continue;
 
     const transformed: PrayerTime[] = days.map((day: any) => {
-      const dateStr = String(day.DATE ?? day.date ?? '');
-      const dayNumber = parseInt(dateStr.split('-')[0], 10) || 0;
+      const dateStr = String(day.DATE ?? day.date ?? '').trim();
+      let dayNumber = 0;
+      if (dateStr) {
+        const parts = dateStr.split('-');
+        const firstPartNum = parseInt(parts[0], 10);
+        const lastPartNum = parseInt(parts[parts.length - 1], 10);
+        if (!isNaN(firstPartNum)) {
+          dayNumber = firstPartNum;
+        } else if (!isNaN(lastPartNum)) {
+          dayNumber = lastPartNum;
+        }
+      }
 
       return {
         date: dayNumber,

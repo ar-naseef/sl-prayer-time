@@ -12,6 +12,22 @@ const MONTHS = [
   "Jan", "Feb", "Mar", "Apr", "May", "June",
   "July", "Aug", "Sep", "Oct", "Nov", "Dec",
 ];
+
+// Map month text from PDF/file name to canonical 3-letter lowercase key
+const MONTH_NAME_TO_KEY = {
+  jan: "jan",
+  feb: "feb",
+  mar: "mar",
+  apr: "apr",
+  may: "may",
+  june: "jun",
+  july: "jul",
+  aug: "aug",
+  sep: "sep",
+  oct: "oct",
+  nov: "nov",
+  dec: "dec",
+};
 // Match trailing -N-Month (e.g. -1-Jan, -12-Dec) to get region key without number
 const MONTH_SUFFIX_RE = new RegExp(
   `-\\d+-(${MONTHS.join("|")})$`,
@@ -23,7 +39,7 @@ function getRegionKeyAndMonth(pdfPath) {
   const match = basename.match(MONTH_SUFFIX_RE);
   if (!match) return { regionKey: basename, month: null };
   const monthName = match[1];
-  const monthKey = monthName.toLowerCase();
+  const monthKey = MONTH_NAME_TO_KEY[monthName.toLowerCase()] ?? monthName.toLowerCase();
   const regionKey = basename.slice(0, -match[0].length);
   return { regionKey, month: monthKey };
 }
@@ -101,7 +117,7 @@ async function main() {
         continue;
       }
       if (!out[regionKey]) out[regionKey] = {};
-      out[regionKey][month] = rows; // month is lowercase: jan, feb, ...
+      out[regionKey][month] = rows; // month is lowercase 3-letter key: jan, feb, ..., jun, jul
       console.log(`${rows.length} rows`);
     } catch (err) {
       console.log("error:", err.message);
