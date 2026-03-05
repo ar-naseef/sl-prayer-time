@@ -13,10 +13,7 @@ import type {
   PrayerTime,
 } from "@/data/prayerTimes";
 import { formatTimeForDisplay } from "@/data/prayerTimes";
-import {
-  districtNameToPath,
-  regionToPath,
-} from "@/lib/regions";
+import { districtNameToPath } from "@/lib/regions";
 
 const months = [
   "jan",
@@ -47,98 +44,34 @@ const monthNames = [
   "December",
 ];
 
-type DistrictCoord = {
-  regionSlug: string;
-  district: string;
-  lat: number;
-  lng: number;
-};
-
-// Approximate centers for each district, mapped to the prayer-time regions
-const DISTRICT_COORDS: DistrictCoord[] = [
-  // Colombo, Gampaha, Kalutara (Western)
-  { regionSlug: "colombo-gampaha-kalutara", district: "Colombo", lat: 6.927, lng: 79.861 },
-  { regionSlug: "colombo-gampaha-kalutara", district: "Gampaha", lat: 7.094, lng: 79.991 },
-  { regionSlug: "colombo-gampaha-kalutara", district: "Kalutara", lat: 6.585, lng: 79.96 },
-
-  // Kandy, Matale, Nuwara Eliya (Central)
-  { regionSlug: "kandy-matale-nuwara-eliya", district: "Kandy", lat: 7.29, lng: 80.633 },
-  { regionSlug: "kandy-matale-nuwara-eliya", district: "Matale", lat: 7.466, lng: 80.623 },
-  { regionSlug: "kandy-matale-nuwara-eliya", district: "Nuwara Eliya", lat: 6.949, lng: 80.787 },
-
-  // Galle, Matara (Southern)
-  { regionSlug: "galle-matara", district: "Galle", lat: 6.053, lng: 80.22 },
-  { regionSlug: "galle-matara", district: "Matara", lat: 5.948, lng: 80.537 },
-
-  // Hambantota (Southern)
-  { regionSlug: "hambantota", district: "Hambantota", lat: 6.139, lng: 81.119 },
-
-  // Jaffna (Northern)
-  { regionSlug: "jaffna", district: "Jaffna", lat: 9.664, lng: 80.016 },
-
-  // Kilinochchi, Mannar, Mullaitivu, Vavuniya (Northern)
-  { regionSlug: "mullaittivu-kilinochchi-vavuniya", district: "Kilinochchi", lat: 9.368, lng: 80.3213 },
-  { regionSlug: "mannar-puttalam", district: "Mannar", lat: 8.98, lng: 79.904 },
-  { regionSlug: "mullaittivu-kilinochchi-vavuniya", district: "Mullaitivu", lat: 9.2236, lng: 80.7909 },
-  { regionSlug: "mullaittivu-kilinochchi-vavuniya", district: "Vavuniya", lat: 8.752, lng: 80.495 },
-
-  // Anuradhapura, Polonnaruwa (North Central)
-  { regionSlug: "anuradhapura-polonnaruwa", district: "Anuradhapura", lat: 8.311, lng: 80.387 },
-  { regionSlug: "anuradhapura-polonnaruwa", district: "Polonnaruwa", lat: 7.94, lng: 81.0 },
-
-  // Kurunegala, Puttalam (North Western)
-  { regionSlug: "kurunegala", district: "Kurunegala", lat: 7.74, lng: 80.19 },
-  { regionSlug: "mannar-puttalam", district: "Puttalam", lat: 8.033, lng: 79.829 },
-
-  // Ratnapura, Kegalle (Sabaragamuwa)
-  { regionSlug: "ratnapura-kegalle", district: "Ratnapura", lat: 6.682, lng: 80.399 },
-  { regionSlug: "ratnapura-kegalle", district: "Kegalle", lat: 7.25, lng: 80.342 },
-
-  // Trincomalee, Batticaloa, Ampara (Eastern)
-  { regionSlug: "trincomalee", district: "Trincomalee", lat: 8.587, lng: 81.215 },
-  { regionSlug: "batticaloa-ampara", district: "Batticaloa", lat: 7.716, lng: 81.694 },
-  { regionSlug: "batticaloa-ampara", district: "Ampara", lat: 7.296, lng: 81.674 },
-
-  // Badulla, Monaragala (Uva)
-  { regionSlug: "badulla-monaragala", district: "Badulla", lat: 6.993, lng: 81.055 },
-  { regionSlug: "badulla-monaragala", district: "Monaragala", lat: 6.87, lng: 81.348 },
+// Region slug → district names for the location dropdown
+const REGION_DISTRICTS: { regionSlug: string; district: string }[] = [
+  { regionSlug: "colombo-gampaha-kalutara", district: "Colombo" },
+  { regionSlug: "colombo-gampaha-kalutara", district: "Gampaha" },
+  { regionSlug: "colombo-gampaha-kalutara", district: "Kalutara" },
+  { regionSlug: "kandy-matale-nuwara-eliya", district: "Kandy" },
+  { regionSlug: "kandy-matale-nuwara-eliya", district: "Matale" },
+  { regionSlug: "kandy-matale-nuwara-eliya", district: "Nuwara Eliya" },
+  { regionSlug: "galle-matara", district: "Galle" },
+  { regionSlug: "galle-matara", district: "Matara" },
+  { regionSlug: "hambantota", district: "Hambantota" },
+  { regionSlug: "jaffna", district: "Jaffna" },
+  { regionSlug: "mullaittivu-kilinochchi-vavuniya", district: "Kilinochchi" },
+  { regionSlug: "mannar-puttalam", district: "Mannar" },
+  { regionSlug: "mullaittivu-kilinochchi-vavuniya", district: "Mullaitivu" },
+  { regionSlug: "mullaittivu-kilinochchi-vavuniya", district: "Vavuniya" },
+  { regionSlug: "anuradhapura-polonnaruwa", district: "Anuradhapura" },
+  { regionSlug: "anuradhapura-polonnaruwa", district: "Polonnaruwa" },
+  { regionSlug: "kurunegala", district: "Kurunegala" },
+  { regionSlug: "mannar-puttalam", district: "Puttalam" },
+  { regionSlug: "ratnapura-kegalle", district: "Ratnapura" },
+  { regionSlug: "ratnapura-kegalle", district: "Kegalle" },
+  { regionSlug: "trincomalee", district: "Trincomalee" },
+  { regionSlug: "batticaloa-ampara", district: "Batticaloa" },
+  { regionSlug: "batticaloa-ampara", district: "Ampara" },
+  { regionSlug: "badulla-monaragala", district: "Badulla" },
+  { regionSlug: "badulla-monaragala", district: "Monaragala" },
 ];
-
-const toRad = (value: number) => (value * Math.PI) / 180;
-
-const distanceKm = (lat1: number, lng1: number, lat2: number, lng2: number) => {
-  const R = 6371; // km
-  const dLat = toRad(lat2 - lat1);
-  const dLng = toRad(lng2 - lng1);
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(lat1)) *
-      Math.cos(toRad(lat2)) *
-      Math.sin(dLng / 2) *
-      Math.sin(dLng / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-};
-
-function getNearestRegionSlug(lat: number, lng: number): string | null {
-  let bestSlug: string | null = null;
-  let bestDistance = Number.POSITIVE_INFINITY;
-
-  for (const coord of DISTRICT_COORDS) {
-    const d = distanceKm(lat, lng, coord.lat, coord.lng);
-    if (d < bestDistance) {
-      bestDistance = d;
-      bestSlug = coord.regionSlug;
-    }
-  }
-
-  // If the user is clearly far from Sri Lanka, don't auto-select
-  if (bestDistance > 500) return null;
-  return bestSlug;
-}
-
-const STORAGE_KEY_REGION = "selectedDistrict";
-const STORAGE_KEY_DISTRICT_NAME = "selectedDistrictName";
 
 interface PrayerTimesPageProps {
   /** Region slug from URL (internal mapping). */
@@ -184,52 +117,22 @@ export default function Home({
     fetchData();
   }, []);
 
-  // Priority 1: URL. Priority 2: localStorage. Priority 3: leave empty.
   useEffect(() => {
     if (!districts.length) return;
+    if (selectedDistrict) return;
     if (initialRegionSlug && initialDistrictName) {
       const exists = districts.some((d) => d.value === initialRegionSlug);
       if (exists) {
         setSelectedDistrict(initialRegionSlug);
         setSelectedDistrictName(initialDistrictName);
-        return;
       }
     }
-    if (selectedDistrict) return;
-    if (typeof window === "undefined") return;
-    const storedRegion = window.localStorage.getItem(STORAGE_KEY_REGION);
-    const storedName =
-      window.localStorage.getItem(STORAGE_KEY_DISTRICT_NAME) ?? "";
-    if (!storedRegion) return;
-    const exists = districts.some((d) => d.value === storedRegion);
-    if (exists) {
-      setSelectedDistrict(storedRegion);
-      setSelectedDistrictName(
-        storedName ||
-          (districts.find((d) => d.value === storedRegion)?.label ?? ""),
-      );
-      router.replace(
-        storedName
-          ? districtNameToPath(storedName)
-          : regionToPath(storedRegion),
-      );
-    }
-  }, [
-    districts,
-    initialRegionSlug,
-    initialDistrictName,
-    selectedDistrict,
-    router,
-  ]);
+  }, [districts, initialRegionSlug, initialDistrictName, selectedDistrict]);
 
   const handleDistrictChange = useCallback(
     (regionValue: string, districtName: string) => {
       setSelectedDistrict(regionValue);
       setSelectedDistrictName(districtName);
-      if (typeof window !== "undefined") {
-        window.localStorage.setItem(STORAGE_KEY_REGION, regionValue);
-        window.localStorage.setItem(STORAGE_KEY_DISTRICT_NAME, districtName);
-      }
       router.push(districtNameToPath(districtName));
     },
     [router],
@@ -238,7 +141,7 @@ export default function Home({
   // Group regions by district names for the dropdown (region label = group header, district names = options)
   const groupedDistricts = useMemo(() => {
     return districts.map((d) => {
-      const names = DISTRICT_COORDS.filter((c) => c.regionSlug === d.value).map(
+      const names = REGION_DISTRICTS.filter((c) => c.regionSlug === d.value).map(
         (c) => c.district,
       );
       return {

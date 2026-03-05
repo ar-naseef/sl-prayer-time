@@ -53,13 +53,6 @@ const SLUG_ALIASES: Record<string, string> = {
 };
 
 /**
- * Turn a region slug into the URL path (internal fallback e.g. legacy localStorage).
- */
-export function regionToPath(regionSlug: string): string {
-  return `/${regionSlug}${PRAYER_TIMES_SUFFIX}`;
-}
-
-/**
  * Turn a district display name into the URL path (e.g. "Kegalle" → "/kegalle-prayer-times").
  * Use this for all user-facing URLs; region is internal only.
  */
