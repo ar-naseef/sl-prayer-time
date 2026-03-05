@@ -24,7 +24,7 @@ const PRAYER_TIMES_SUFFIX = "-prayer-times";
  * Short / district-style URL segments map to region slug.
  * Enables /kegalle-prayer-times and /ratnapura-prayer-times etc.
  */
-const SLUG_ALIASES: Record<string, string> = {
+export const SLUG_ALIASES: Record<string, string> = {
   kegalle: "ratnapura-kegalle",
   ratnapura: "ratnapura-kegalle",
   colombo: "colombo-gampaha-kalutara",
@@ -87,4 +87,9 @@ export function resolveSlugFromUrl(segment: string): string | null {
   const part = trimmed.slice(0, -PRAYER_TIMES_SUFFIX.length);
   const resolved = SLUG_ALIASES[part] ?? part;
   return REGION_SLUGS.has(resolved) ? resolved : null;
+}
+
+/** All district URL path segments for sitemap (e.g. "kegalle", "nuwara-eliya"). */
+export function getDistrictPathSegments(): string[] {
+  return Object.keys(SLUG_ALIASES);
 }
