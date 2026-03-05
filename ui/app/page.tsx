@@ -164,35 +164,6 @@ export default function Home() {
     fetchData();
   }, []);
 
-  // Try to auto-detect region based on browser geolocation
-  useEffect(() => {
-    if (!prayerTimesData || !districts.length) return;
-    if (selectedDistrict) return;
-    if (typeof window === "undefined" || !("geolocation" in navigator)) return;
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-        console.log("latitude", latitude);
-        console.log("longitude", longitude);
-        const slug = getNearestRegionSlug(latitude, longitude);
-        if (!slug) return;
-        setSelectedDistrict(slug);
-        const label = districts.find((d) => d.value === slug)?.label;
-        if (label) {
-          toast.success(`Detected region: ${label}`);
-        }
-      },
-      (error) => {
-        console.warn("Geolocation error", error);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-      },
-    );
-  }, [prayerTimesData, districts, selectedDistrict]);
-
   const districtData: DistrictPrayerTimes | null = useMemo(() => {
     if (!selectedDistrict || !prayerTimesData) return null;
     return prayerTimesData[selectedDistrict] || null;
