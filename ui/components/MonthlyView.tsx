@@ -16,6 +16,14 @@ export default function MonthlyView({ data, district, month, isCurrentMonth }: M
   const [expandedDates, setExpandedDates] = useState<Set<number>>(new Set());
   const tableBodyRef = useRef<HTMLTableSectionElement>(null);
 
+  const today = new Date().getDate();
+
+  useEffect(() => {
+    if (!isCurrentMonth || !tableBodyRef.current) return;
+    const row = tableBodyRef.current.querySelector(`[data-date="${today}"]`);
+    row?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, [isCurrentMonth, today]);
+
   const toggleExpanded = (date: number) => {
     const newExpanded = new Set(expandedDates);
     if (newExpanded.has(date)) {
@@ -26,42 +34,36 @@ export default function MonthlyView({ data, district, month, isCurrentMonth }: M
     setExpandedDates(newExpanded);
   };
 
-  if (data.length === 0) return null;
-
-  const today = new Date().getDate();
-
-  useEffect(() => {
-    if (!isCurrentMonth || !tableBodyRef.current) return;
-    const row = tableBodyRef.current.querySelector(`[data-date="${today}"]`);
-    row?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }, [isCurrentMonth, today]);
+  const hasData = data.length > 0;
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-primary/10">
-            <Calendar className="w-5 h-5 text-primary" />
+      {hasData && (
+        <>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-primary/10">
+                <Calendar className="w-5 h-5 text-primary" />
+              </div>
+              <h3 className="text-2xl font-bold text-foreground">
+                {month} Prayer Times
+              </h3>
+            </div>
+            {isCurrentMonth && (
+              <button
+                type="button"
+                className="text-sm font-medium text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary/40 px-3 py-1.5"
+                onClick={() => {
+                  tableBodyRef.current?.querySelector(`[data-date="${today}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }}
+              >
+                Jump to today
+              </button>
+            )}
           </div>
-          <h3 className="text-2xl font-bold text-foreground">
-            {month} Prayer Times
-          </h3>
-        </div>
-        {isCurrentMonth && (
-          <button
-            type="button"
-            className="text-sm font-medium text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary/40 px-3 py-1.5"
-            onClick={() => {
-              tableBodyRef.current?.querySelector(`[data-date="${today}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }}
-          >
-            Jump to today
-          </button>
-        )}
-      </div>
 
-      {/* Desktop Table View */}
-      <div className="hidden md:block overflow-x-auto overflow-y-auto max-h-[70vh] border border-border/50">
+          {/* Desktop Table View */}
+          <div className="hidden md:block overflow-x-auto overflow-y-auto max-h-[70vh] border border-border/50">
           <table className="w-full text-sm">
           <thead className="bg-muted border-b border-border/60 sticky top-0 z-10">
             <tr>
@@ -75,9 +77,9 @@ export default function MonthlyView({ data, district, month, isCurrentMonth }: M
             </tr>
           </thead>
           <tbody ref={tableBodyRef}>
-            {data.map((prayer, index) => (
+            {data.map((prayer) => (
               <tr
-                key={index}
+                key={prayer.date}
                 data-date={prayer.date}
                 className={`border-b border-border/30 transition-colors last:border-b-0 ${
                   isCurrentMonth && prayer.date === today
@@ -162,7 +164,9 @@ export default function MonthlyView({ data, district, month, isCurrentMonth }: M
             )}
           </div>
         ))}
-      </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

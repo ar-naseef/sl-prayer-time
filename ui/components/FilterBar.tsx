@@ -1,12 +1,22 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, Fragment } from "react";
 import { Calendar, ChevronDown, MapPin, Search, X } from "lucide-react";
+
+export type GroupedDistrict = {
+  value: string;
+  label: string;
+  districtNames: string[];
+};
 
 interface FilterBarProps {
   districts: { value: string; label: string }[];
+  /** Regions with district names for grouped dropdown (by district). */
+  groupedDistricts?: GroupedDistrict[];
   selectedDistrict: string;
-  onDistrictChange: (value: string) => void;
+  /** District name for display and URL (e.g. "Kegalle"). Region is internal only. */
+  selectedDistrictName?: string;
+  onDistrictChange: (regionValue: string, districtName: string) => void;
   selectedMonthIndex: number;
   onMonthChange: (index: number) => void;
   months: string[];
@@ -15,7 +25,9 @@ interface FilterBarProps {
 
 export default function FilterBar({
   districts,
+  groupedDistricts,
   selectedDistrict,
+  selectedDistrictName,
   onDistrictChange,
   selectedMonthIndex,
   onMonthChange,
@@ -62,13 +74,35 @@ export default function FilterBar({
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  const query = searchQuery.trim().toLowerCase();
+
   const filteredDistricts = districts.filter((district) =>
-    district.label.toLowerCase().includes(searchQuery.toLowerCase()),
+    district.label.toLowerCase().includes(query),
   );
+
+  const filteredGroups =
+    groupedDistricts?.map((group) => {
+      const labelMatches = group.label.toLowerCase().includes(query);
+      const anyDistrictMatches = group.districtNames.some((name) =>
+        name.toLowerCase().includes(query),
+      );
+      const matchesQuery = !query || labelMatches || anyDistrictMatches;
+      if (!matchesQuery)
+        return { ...group, districtNames: [] as string[] };
+      if (!query) return group;
+      if (labelMatches) return group;
+      return {
+        ...group,
+        districtNames: group.districtNames.filter((name) =>
+          name.toLowerCase().includes(query),
+        ),
+      };
+    }).filter((g) => g.districtNames.length > 0) ?? null;
 
   const selectedLabel = districts.find(
     (d) => d.value === selectedDistrict,
   )?.label;
+  const displayLabel = selectedDistrictName || selectedLabel;
 
   return (
     <div className="bg-card border border-border/50 p-6 md:p-8">
@@ -85,15 +119,15 @@ export default function FilterBar({
               aria-expanded={isDistrictOpen}
               aria-haspopup="listbox"
               aria-label={
-                selectedDistrict
-                  ? `Location: ${selectedLabel}`
+                displayLabel
+                  ? `Location: ${displayLabel}`
                   : "Choose location"
               }
               className="w-full min-h-12 px-5 py-3 border border-border/50 bg-background/50 text-foreground hover:border-primary/30 hover:bg-background flex items-center justify-between text-sm font-medium transition-colors duration-200"
             >
               <span className="flex items-center gap-3 min-w-0">
                 <MapPin className="w-4 h-4 text-primary shrink-0" aria-hidden />
-                <span className="truncate">{selectedLabel || "Choose a district..."}</span>
+                <span className="truncate">{displayLabel || "Choose a district..."}</span>
               </span>
               <ChevronDown
                 className={`w-4 h-4 text-primary shrink-0 transition-transform duration-300 ${
@@ -125,39 +159,94 @@ export default function FilterBar({
                   </div>
                 </div>
 
-                <ul className="max-h-72 overflow-y-auto">
-                  {filteredDistricts.map((district, index) => (
-                    <li key={district.value}>
-                      <button
-                        type="button"
-                        role="option"
-                        aria-selected={selectedDistrict === district.value}
-                        onClick={() => {
-                          onDistrictChange(district.value);
-                          setIsDistrictOpen(false);
-                          setSearchQuery("");
-                        }}
-                        className={`w-full text-left px-5 py-4 text-sm transition-colors duration-150 flex items-center gap-3 ${
-                          selectedDistrict === district.value ?
-                            "bg-primary/12 text-primary font-semibold"
-                          : "text-foreground hover:bg-secondary/15"
-                        } ${index > 0 ? "border-t border-border/20" : ""}`}
-                      >
-                        {selectedDistrict === district.value && (
-                          <span
-                            className="w-2 h-2 bg-primary rounded-full shrink-0"
-                            aria-hidden
-                          />
-                        )}
-                        {district.label}
-                      </button>
-                    </li>
-                  ))}
-
-                  {filteredDistricts.length === 0 && (
-                    <li className="px-5 py-8 text-center text-muted-foreground text-sm">
-                      No districts found
-                    </li>
+                <ul className="max-h-72 overflow-y-auto" role="listbox">
+                  {filteredGroups ? (
+                    <>
+                      {filteredGroups.map((group) => (
+                        <Fragment key={group.value}>
+                          <li
+                            className="sticky top-0 z-10 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground bg-muted/60 border-t border-b border-border/30 list-none"
+                            role="presentation"
+                          >
+                            {group.label}
+                          </li>
+                          {group.districtNames.map((name) => (
+                            <li key={`${group.value}-${name}`}>
+                              <button
+                                type="button"
+                                role="option"
+                                aria-selected={
+                                  selectedDistrict === group.value &&
+                                  selectedDistrictName === name
+                                }
+                                onClick={() => {
+                                  onDistrictChange(group.value, name);
+                                  setIsDistrictOpen(false);
+                                  setSearchQuery("");
+                                }}
+                                className={`w-full text-left pl-6 pr-5 py-3 text-sm transition-colors duration-150 flex items-center gap-3 ${
+                                  selectedDistrict === group.value &&
+                                  selectedDistrictName === name
+                                    ? "bg-primary/12 text-primary font-semibold"
+                                    : "text-foreground hover:bg-secondary/15"
+                                } border-t border-border/20`}
+                              >
+                                {selectedDistrict === group.value &&
+                                  selectedDistrictName === name && (
+                                  <span
+                                    className="w-2 h-2 bg-primary rounded-full shrink-0"
+                                    aria-hidden
+                                  />
+                                )}
+                                {name}
+                              </button>
+                            </li>
+                          ))}
+                        </Fragment>
+                      ))}
+                      {filteredGroups.length === 0 && (
+                        <li className="px-5 py-8 text-center text-muted-foreground text-sm">
+                          No districts found
+                        </li>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      {filteredDistricts.map((district, index) => (
+                        <li key={district.value}>
+                          <button
+                            type="button"
+                            role="option"
+                            aria-selected={
+                              selectedDistrict === district.value
+                            }
+                            onClick={() => {
+                              onDistrictChange(district.value, district.label);
+                              setIsDistrictOpen(false);
+                              setSearchQuery("");
+                            }}
+                            className={`w-full text-left px-5 py-4 text-sm transition-colors duration-150 flex items-center gap-3 ${
+                              selectedDistrict === district.value
+                                ? "bg-primary/12 text-primary font-semibold"
+                                : "text-foreground hover:bg-secondary/15"
+                            } ${index > 0 ? "border-t border-border/20" : ""}`}
+                          >
+                            {selectedDistrict === district.value && (
+                              <span
+                                className="w-2 h-2 bg-primary rounded-full shrink-0"
+                                aria-hidden
+                              />
+                            )}
+                            {district.label}
+                          </button>
+                        </li>
+                      ))}
+                      {filteredDistricts.length === 0 && (
+                        <li className="px-5 py-8 text-center text-muted-foreground text-sm">
+                          No districts found
+                        </li>
+                      )}
+                    </>
                   )}
                 </ul>
               </div>

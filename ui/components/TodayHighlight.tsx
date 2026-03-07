@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Clock, Moon, Sun, Sunrise, Sunset } from 'lucide-react';
-import { parse, differenceInSeconds } from 'date-fns';
+import { differenceInSeconds } from 'date-fns';
 import type { PrayerTime } from '@/data/prayerTimes';
 import { formatTimeForDisplay } from '@/data/prayerTimes';
 
@@ -19,6 +19,15 @@ const prayerDetails = [
   { name: 'Isha', icon: Moon, color: 'from-slate-700 to-slate-900', time: 'isha' },
 ];
 
+function parseTimeToDate(baseDate: Date, timeStr: string): Date | null {
+  if (typeof timeStr !== 'string' || !timeStr.trim()) return null;
+  const parts = timeStr.trim().split(':');
+  const h = parseInt(parts[0], 10);
+  const m = parts[1] != null ? parseInt(parts[1], 10) : 0;
+  if (isNaN(h)) return null;
+  return new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate(), h, isNaN(m) ? 0 : m, 0, 0);
+}
+
 export default function TodayHighlight({ prayerTimes }: TodayHighlightProps) {
   const [timeUntilNext, setTimeUntilNext] = useState<{ name: string; seconds: number; isTomorrow?: boolean } | null>(null);
   const [currentPrayer, setCurrentPrayer] = useState<string | null>(null);
@@ -32,26 +41,29 @@ export default function TodayHighlight({ prayerTimes }: TodayHighlightProps) {
 
       for (const detail of prayerDetails) {
         const timeStr = prayerTimes[detail.time as keyof PrayerTime] as string;
-        const [h, m] = timeStr.split(':').map((n) => parseInt(n, 10));
-        const prayerDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), isNaN(h) ? 0 : h, isNaN(m) ? 0 : m);
+        const prayerDate = parseTimeToDate(now, timeStr);
+        if (!prayerDate) continue;
 
         if (prayerDate > now) {
           nextPrayerTime = prayerDate;
           nextPrayerName = detail.name;
           break;
-        } else {
-          setCurrentPrayer(detail.name);
         }
+        setCurrentPrayer(detail.name);
       }
 
       if (nextPrayerTime) {
-        const secondsUntil = differenceInSeconds(nextPrayerTime, now);
-        setTimeUntilNext({
-          name: nextPrayerName,
-          seconds: secondsUntil > 0 ? secondsUntil : 0,
-        });
+        const secondsUntil = Math.max(0, differenceInSeconds(nextPrayerTime, now));
+        setTimeUntilNext({ name: nextPrayerName, seconds: secondsUntil });
       } else {
-        setTimeUntilNext({ name: 'Fajr', seconds: 0, isTomorrow: true });
+        const fajrStr = prayerTimes.fajr;
+        const tomorrow = new Date(now);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const tomorrowFajr = parseTimeToDate(tomorrow, fajrStr);
+        const secondsUntilFajr = tomorrowFajr
+          ? Math.max(0, differenceInSeconds(tomorrowFajr, now))
+          : 0;
+        setTimeUntilNext({ name: 'Fajr', seconds: secondsUntilFajr, isTomorrow: true });
       }
     };
 
@@ -141,13 +153,11 @@ export default function TodayHighlight({ prayerTimes }: TodayHighlightProps) {
             </div>
             <Clock className="w-10 h-10 text-primary/20 shrink-0" />
           </div>
-          {!timeUntilNext.isTomorrow && (
-            <div className="bg-gradient-to-r from-primary/5 to-accent/5 px-4 py-6 border border-primary/10">
-              <p className="text-center font-mono text-3xl md:text-4xl text-primary font-bold tracking-tight tabular-nums">
-                {formatTime(timeUntilNext.seconds)}
-              </p>
-            </div>
-          )}
+          <div className="bg-gradient-to-r from-primary/5 to-accent/5 px-4 py-6 border border-primary/10">
+            <p className="text-center font-mono text-3xl md:text-4xl text-primary font-bold tracking-tight tabular-nums">
+              {formatTime(timeUntilNext.seconds)}
+            </p>
+          </div>
         </div>
       )}
     </div>
