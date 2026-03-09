@@ -33,7 +33,7 @@ const GROUP_TO_SLUG_AND_LABEL: Record<
     slug: "mannar-puttalam",
     label: "Mannar & Puttalam",
   },
-  "05-ANURADHAPURA-DISTRICT-POLONNARWA-DISTRICT": {
+  "05-ANURADHAPURA-DISTRICT-POLONNARUWA-DISTRICT": {
     slug: "anuradhapura-polonnaruwa",
     label: "Anuradhapura & Polonnaruwa",
   },

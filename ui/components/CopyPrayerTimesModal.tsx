@@ -23,6 +23,24 @@ const DEFAULT_SELECTED_SLUGS = [
   "kurunegala",
 ];
 
+const ORDERED_COPY_REGION_SLUGS = [
+  "colombo-gampaha-kalutara",
+  "ratnapura-kegalle",
+  "kandy-matale-nuwara-eliya",
+  "badulla-monaragala",
+  "anuradhapura-polonnaruwa",
+  "kurunegala",
+];
+
+const COPY_REGION_LABEL_OVERRIDES: Record<string, string> = {
+  "colombo-gampaha-kalutara": "Colombo, Gampaha, Kalutara",
+  "ratnapura-kegalle": "Kegalle, Ratnapura",
+  "kandy-matale-nuwara-eliya": "Kandy, Matale, Nuwara Eliya",
+  "badulla-monaragala": "Badulla, Monaragala",
+  "anuradhapura-polonnaruwa": "Anuradhapura, Polonnaruwa",
+  kurunegala: "Kurunegala",
+};
+
 interface CopyPrayerTimesModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -40,6 +58,33 @@ export default function CopyPrayerTimesModal({
 }: CopyPrayerTimesModalProps) {
   const [selectedSlugs, setSelectedSlugs] = useState<Set<string>>(
     () => new Set(defaultSelectedSlugs)
+  );
+  const regionOrder = useMemo(
+    () =>
+      new Map(
+        ORDERED_COPY_REGION_SLUGS.map((slug, idx) => [slug, idx] as const)
+      ),
+    []
+  );
+  const orderedDistricts = useMemo(
+    () =>
+      districts
+        .map((district, idx) => ({ district, idx }))
+        .sort((a, b) => {
+          const aOrder = regionOrder.get(a.district.value) ?? Number.MAX_SAFE_INTEGER;
+          const bOrder = regionOrder.get(b.district.value) ?? Number.MAX_SAFE_INTEGER;
+          if (aOrder !== bOrder) return aOrder - bOrder;
+          return a.idx - b.idx;
+        })
+        .map(({ district }) => district),
+    [districts, regionOrder]
+  );
+  const orderedSelectedSlugs = useMemo(
+    () =>
+      orderedDistricts
+        .filter((d) => selectedSlugs.has(d.value))
+        .map((d) => d.value),
+    [orderedDistricts, selectedSlugs]
   );
 
   useEffect(() => {
@@ -59,12 +104,12 @@ export default function CopyPrayerTimesModal({
   };
 
   const previewText = useMemo(
-    () => getCopyTextForRegions(Array.from(selectedSlugs)),
-    [getCopyTextForRegions, selectedSlugs]
+    () => getCopyTextForRegions(orderedSelectedSlugs),
+    [getCopyTextForRegions, orderedSelectedSlugs]
   );
 
   const handleCopy = async () => {
-    const slugs = Array.from(selectedSlugs);
+    const slugs = orderedSelectedSlugs;
     if (slugs.length === 0) {
       toast.error("Select at least one region");
       return;
@@ -100,7 +145,7 @@ export default function CopyPrayerTimesModal({
                 Regions
               </span>
               <div className="grid max-h-[40vh] gap-1 overflow-y-auto pr-1 md:max-h-[45vh]">
-                {districts.map((d) => (
+                {orderedDistricts.map((d) => (
                   <label
                     key={d.value}
                     className="flex cursor-pointer items-center gap-3 rounded-md border border-transparent px-3 py-2 hover:bg-muted/50"
@@ -109,7 +154,9 @@ export default function CopyPrayerTimesModal({
                       checked={selectedSlugs.has(d.value)}
                       onCheckedChange={() => toggleSlug(d.value)}
                     />
-                    <span className="text-sm">{d.label}</span>
+                    <span className="text-sm">
+                      {COPY_REGION_LABEL_OVERRIDES[d.value] ?? d.label}
+                    </span>
                   </label>
                 ))}
               </div>

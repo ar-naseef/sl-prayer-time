@@ -80,10 +80,18 @@ export default function TodayHighlight({ prayerTimes }: TodayHighlightProps) {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 items-stretch">
-      {/* Column 1: Today's prayer times */}
-      <div className={`grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 ${!timeUntilNext ? 'md:col-span-2' : ''} min-w-0 h-full`}>
-        {prayerDetails.map((prayer) => {
+    <section className="space-y-4">
+      <div className="flex items-center gap-3">
+        <div className="p-2 bg-primary/10">
+          <Clock className="w-5 h-5 text-primary" />
+        </div>
+        <h3 className="text-2xl font-bold text-foreground">Today's Highlights</h3>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 items-stretch">
+        {/* Column 1: Today's prayer times */}
+        <div className={`grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 ${!timeUntilNext ? 'md:col-span-2' : ''} min-w-0 h-full`}>
+          {prayerDetails.map((prayer) => {
           const Icon = prayer.icon;
           const timeStr = prayerTimes[prayer.time as keyof PrayerTime] as string;
           const isCurrentPrayer = currentPrayer === prayer.name;
@@ -133,33 +141,34 @@ export default function TodayHighlight({ prayerTimes }: TodayHighlightProps) {
               </div>
             </div>
           );
-        })}
-      </div>
-
-      {/* Column 2: Next prayer in (right side) */}
-      {timeUntilNext && (
-        <div className="h-full flex flex-col bg-card border border-primary/20 p-5 md:p-6">
-          <div className="flex items-center justify-between gap-3 mb-3">
-            <div className="min-w-0">
-              <p className="text-muted-foreground text-xs font-medium uppercase tracking-wider mb-1">
-                {timeUntilNext.isTomorrow ? 'Next prayer' : 'Next prayer in'}
-              </p>
-              <h2 className="text-xl md:text-2xl font-bold text-primary truncate">
-                {timeUntilNext.name}
-                {timeUntilNext.isTomorrow && (
-                  <span className="text-base md:text-lg font-normal text-muted-foreground ml-1.5">(tomorrow)</span>
-                )}
-              </h2>
-            </div>
-            <Clock className="w-10 h-10 text-primary/20 shrink-0" />
-          </div>
-          <div className="bg-gradient-to-r from-primary/5 to-accent/5 px-4 py-6 border border-primary/10">
-            <p className="text-center font-mono text-3xl md:text-4xl text-primary font-bold tracking-tight tabular-nums">
-              {formatTime(timeUntilNext.seconds)}
-            </p>
-          </div>
+          })}
         </div>
-      )}
-    </div>
+
+        {/* Column 2: Next prayer in (right side) */}
+        {timeUntilNext && (
+          <div className="h-full flex flex-col bg-card border border-primary/20 p-5 md:p-6">
+            <div className="flex items-center justify-between gap-3 mb-3">
+              <div className="min-w-0">
+                <p className="text-muted-foreground text-xs font-medium uppercase tracking-wider mb-1">
+                  {timeUntilNext.isTomorrow ? 'Next prayer' : 'Next prayer in'}
+                </p>
+                <h2 className="text-xl md:text-2xl font-bold text-primary truncate">
+                  {timeUntilNext.name}
+                  {timeUntilNext.isTomorrow && (
+                    <span className="text-base md:text-lg font-normal text-muted-foreground ml-1.5">(tomorrow)</span>
+                  )}
+                </h2>
+              </div>
+              <Clock className="w-10 h-10 text-primary/20 shrink-0" />
+            </div>
+            <div className="bg-gradient-to-r from-primary/5 to-accent/5 px-4 py-6 border border-primary/10">
+              <p className="text-center font-mono text-3xl md:text-4xl text-primary font-bold tracking-tight tabular-nums">
+                {formatTime(timeUntilNext.seconds)}
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
   );
 }

@@ -26,6 +26,24 @@ const monthNames = [
   "July", "August", "September", "October", "November", "December",
 ];
 
+const ORDERED_COPY_REGION_SLUGS = [
+  "colombo-gampaha-kalutara",
+  "ratnapura-kegalle",
+  "kandy-matale-nuwara-eliya",
+  "badulla-monaragala",
+  "anuradhapura-polonnaruwa",
+  "kurunegala",
+];
+
+const COPY_REGION_LABEL_OVERRIDES: Record<string, string> = {
+  "colombo-gampaha-kalutara": "Colombo, Gampaha, Kalutara",
+  "ratnapura-kegalle": "Kegalle, Ratnapura",
+  "kandy-matale-nuwara-eliya": "Kandy, Matale, Nuwara Eliya",
+  "badulla-monaragala": "Badulla, Monaragala",
+  "anuradhapura-polonnaruwa": "Anuradhapura, Polonnaruwa",
+  kurunegala: "Kurunegala",
+};
+
 const REGION_DISTRICTS: { regionSlug: string; district: string }[] = [
   { regionSlug: "colombo-gampaha-kalutara", district: "Colombo" },
   { regionSlug: "colombo-gampaha-kalutara", district: "Gampaha" },
@@ -81,6 +99,13 @@ export default function PrayerTimesClient({
   const prayerTimesData = initialData;
   const districts = initialDistricts;
   const isLoading = false;
+  const copyRegionOrder = useMemo(
+    () =>
+      new Map(
+        ORDERED_COPY_REGION_SLUGS.map((slug, idx) => [slug, idx] as const)
+      ),
+    []
+  );
 
   // Restore cached location when user lands on / (no district in URL)
   useEffect(() => {
@@ -140,10 +165,13 @@ export default function PrayerTimesClient({
   }, [districtData, selectedMonthIndex]);
 
   const todayData: PrayerTime | null = useMemo(() => {
-    if (!monthData.length) return null;
-    const todayDate = new Date().getDate();
-    return monthData.find((day) => day.date === todayDate) || null;
-  }, [monthData]);
+    if (!districtData) return null;
+    const now = new Date();
+    const currentMonthKey = months[now.getMonth()] as keyof DistrictPrayerTimes;
+    const currentMonthData = districtData[currentMonthKey];
+    if (!currentMonthData?.length) return null;
+    return currentMonthData.find((day) => day.date === now.getDate()) || null;
+  }, [districtData]);
 
   const getOrdinal = (n: number) => {
     const s = ["th", "st", "nd", "rd"];
@@ -168,7 +196,18 @@ export default function PrayerTimesClient({
         `${monthName} ${year} (${getOrdinal(day)})`,
         "",
       ];
-      for (const { value, label } of districts) {
+      const orderedDistricts = districts
+        .map((district, idx) => ({ district, idx }))
+        .sort((a, b) => {
+          const aOrder =
+            copyRegionOrder.get(a.district.value) ?? Number.MAX_SAFE_INTEGER;
+          const bOrder =
+            copyRegionOrder.get(b.district.value) ?? Number.MAX_SAFE_INTEGER;
+          if (aOrder !== bOrder) return aOrder - bOrder;
+          return a.idx - b.idx;
+        })
+        .map(({ district }) => district);
+      for (const { value, label } of orderedDistricts) {
         if (!slugSet.has(value)) continue;
         const dData = prayerTimesData[value];
         if (!dData) continue;
@@ -176,7 +215,9 @@ export default function PrayerTimesClient({
         if (!monthRows?.length) continue;
         const dayRow = monthRows.find((r) => r.date === day);
         if (!dayRow) continue;
-        lines.push(`*${label}*`);
+        const regionLabel =
+          COPY_REGION_LABEL_OVERRIDES[value] ?? label.replace(/\s*&\s*/g, ", ");
+        lines.push(`*${regionLabel}*`);
         lines.push("");
         lines.push(`Subah – ${formatTimeForDisplay(dayRow.fajr)}`);
         lines.push(`Sunrise – ${formatTimeForDisplay(dayRow.sunrise)}`);
@@ -188,7 +229,7 @@ export default function PrayerTimesClient({
       }
       return lines.join("\n").trimEnd();
     },
-    [prayerTimesData, districts]
+    [prayerTimesData, districts, copyRegionOrder]
   );
 
   return (
