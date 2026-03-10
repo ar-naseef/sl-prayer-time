@@ -41,6 +41,14 @@ export default function Footer({ onCopyClick, copyEnabled }: FooterProps) {
               </button>
             )}
           </div>
+          <Link
+            href="https://www.acju.lk/prayer-times/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+          >
+            Source: ACJU Prayer Times
+          </Link>
         </div>
       </div>
     </footer>

@@ -72,6 +72,12 @@ export default function Header() {
             </button>
           </div>
         </div>
+        <div className="mt-3 sm:hidden inline-flex items-center gap-2 px-3 py-2 bg-background/80 border border-border/70">
+          <Calendar className="w-4 h-4 text-primary" aria-hidden />
+          <span className="text-xs font-semibold text-foreground">
+            {format(new Date(), "EEEE, MMMM d, yyyy")}
+          </span>
+        </div>
       </div>
     </header>
   );
