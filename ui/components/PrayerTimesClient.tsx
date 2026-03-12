@@ -192,7 +192,6 @@ export default function PrayerTimesClient({
       const monthKey = months[monthIdx] as keyof DistrictPrayerTimes;
       const lines: string[] = [
         "Prayer Time SL",
-        "",
         `${monthName} ${year} (${getOrdinal(day)})`,
         "",
       ];
