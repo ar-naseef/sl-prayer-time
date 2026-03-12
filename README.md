@@ -2,6 +2,10 @@
 
 Prayer times for Sri Lanka. Web UI and scripts to work with [ACJU](https://www.acju.lk/prayer-times/) prayer time PDFs.
 
+## Live site
+
+[https://srilankasalahtimes.com](https://srilankasalahtimes.com)
+
 ## Project structure
 
 - **`ui/`** — Next.js app: today’s prayer times, next prayer countdown, mobile-friendly UI.
