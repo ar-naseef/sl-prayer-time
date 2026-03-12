@@ -1,4 +1,4 @@
-import { Copy } from "lucide-react";
+import { Copy, Github } from "lucide-react";
 import Link from "next/link";
 
 const LOGO_URL = "https://www.94dev.com/img/94DEV-dark.png";
@@ -21,11 +21,7 @@ export default function Footer({ onCopyClick, copyEnabled }: FooterProps) {
             aria-label="94dev"
           >
             <span className="text-sm">Powered by</span>
-            <img
-              src={LOGO_URL}
-              alt="94dev"
-              className="h-6 w-auto"
-            />
+            <img src={LOGO_URL} alt="94dev" className="h-6 w-auto" />
           </Link>
           <div className="inline-flex items-center justify-center gap-1.5 text-sm text-muted-foreground">
             <span>© {new Date().getFullYear()} Sri Lanka Prayer Times</span>
@@ -41,14 +37,26 @@ export default function Footer({ onCopyClick, copyEnabled }: FooterProps) {
               </button>
             )}
           </div>
-          <Link
-            href="https://www.acju.lk/prayer-times/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
-          >
-            Source: ACJU Prayer Times
-          </Link>
+          <div className="flex  items-center gap-1 text-xs text-muted-foreground">
+            <Link
+              href="https://www.acju.lk/prayer-times/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline-offset-2 hover:text-foreground hover:underline"
+            >
+              Source: ACJU Prayer Times
+            </Link>
+            <span>|</span>
+            <Link
+              href="https://github.com/ar-naseef/sl-prayer-time"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 underline-offset-2 hover:text-foreground hover:underline"
+            >
+              <Github className="w-3 h-3" aria-hidden />
+              <span>Contribute on GitHub</span>
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
