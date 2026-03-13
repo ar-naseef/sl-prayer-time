@@ -18,12 +18,32 @@ import { districtNameToPath } from "@/lib/regions";
 import { getCachedLocation, saveLocation } from "@/lib/locationCache";
 
 const months = [
-  "jan", "feb", "mar", "apr", "may", "jun",
-  "jul", "aug", "sep", "oct", "nov", "dec",
+  "jan",
+  "feb",
+  "mar",
+  "apr",
+  "may",
+  "jun",
+  "jul",
+  "aug",
+  "sep",
+  "oct",
+  "nov",
+  "dec",
 ];
 const monthNames = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
 const ORDERED_COPY_REGION_SLUGS = [
@@ -92,8 +112,8 @@ export default function PrayerTimesClient({
   const router = useRouter();
   const [selectedDistrict, setSelectedDistrict] = useState<string>("");
   const [selectedDistrictName, setSelectedDistrictName] = useState<string>("");
-  const [selectedMonthIndex, setSelectedMonthIndex] = useState(
-    () => new Date().getMonth()
+  const [selectedMonthIndex, setSelectedMonthIndex] = useState(() =>
+    new Date().getMonth(),
   );
   const [copyModalOpen, setCopyModalOpen] = useState(false);
   const prayerTimesData = initialData;
@@ -102,9 +122,9 @@ export default function PrayerTimesClient({
   const copyRegionOrder = useMemo(
     () =>
       new Map(
-        ORDERED_COPY_REGION_SLUGS.map((slug, idx) => [slug, idx] as const)
+        ORDERED_COPY_REGION_SLUGS.map((slug, idx) => [slug, idx] as const),
       ),
-    []
+    [],
   );
 
   // Restore cached location when user lands on / (no district in URL)
@@ -137,14 +157,14 @@ export default function PrayerTimesClient({
       setSelectedDistrictName(districtName);
       router.push(districtNameToPath(districtName));
     },
-    [router]
+    [router],
   );
 
   const groupedDistricts = useMemo(() => {
     return districts.map((d) => {
-      const names = REGION_DISTRICTS.filter((c) => c.regionSlug === d.value).map(
-        (c) => c.district
-      );
+      const names = REGION_DISTRICTS.filter(
+        (c) => c.regionSlug === d.value,
+      ).map((c) => c.district);
       return {
         value: d.value,
         label: d.label,
@@ -218,17 +238,25 @@ export default function PrayerTimesClient({
           COPY_REGION_LABEL_OVERRIDES[value] ?? label.replace(/\s*&\s*/g, ", ");
         lines.push(`*${regionLabel}*`);
         lines.push("");
-        lines.push(`Subah – ${formatTimeForDisplay(dayRow.fajr)}`);
-        lines.push(`Sunrise – ${formatTimeForDisplay(dayRow.sunrise)}`);
-        lines.push(`Luhar – ${formatTimeForDisplay(dayRow.luhr)}`);
-        lines.push(`Asr – ${formatTimeForDisplay(dayRow.asr)}`);
-        lines.push(`Magrib – ${formatTimeForDisplay(dayRow.magrib)}`);
-        lines.push(`Isha – ${formatTimeForDisplay(dayRow.isha)}`);
+        lines.push(
+          `Subah – ${formatTimeForDisplay(dayRow.fajr).split(" ")[0]}`,
+        );
+        lines.push(
+          `Sunrise – ${formatTimeForDisplay(dayRow.sunrise).split(" ")[0]}`,
+        );
+        lines.push(
+          `Luhar – ${formatTimeForDisplay(dayRow.luhr).split(" ")[0]}`,
+        );
+        lines.push(`Asr – ${formatTimeForDisplay(dayRow.asr).split(" ")[0]}`);
+        lines.push(
+          `Magrib – ${formatTimeForDisplay(dayRow.magrib).split(" ")[0]}`,
+        );
+        lines.push(`Isha – ${formatTimeForDisplay(dayRow.isha).split(" ")[0]}`);
         lines.push("");
       }
       return lines.join("\n").trimEnd();
     },
-    [prayerTimesData, districts, copyRegionOrder]
+    [prayerTimesData, districts, copyRegionOrder],
   );
 
   return (
