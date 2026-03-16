@@ -23,9 +23,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!regionSlug) return {};
 
   const urlPart = slug.slice(0, -PRAYER_TIMES_SUFFIX.length);
-  const districtName = slugToDistrictDisplayName(urlPart);
-  const title = `Prayer Times – ${districtName}`;
-  const description = `Daily Islamic prayer times (Fajr, Dhuhr, Asr, Maghrib, Isha) for ${districtName}, Sri Lanka. View today and monthly times.`;
+  const isSriLankaSlug = urlPart.toLowerCase() === "sri-lanka";
+  const districtName = isSriLankaSlug
+    ? "Colombo"
+    : slugToDistrictDisplayName(urlPart);
+  const title = isSriLankaSlug
+    ? "Sri Lanka Prayer Times Today (Fajr, Dhuhr, Asr, Maghrib, Isha) – Sri Lanka Salah Times"
+    : `${districtName} Prayer Times Today (Fajr, Dhuhr, Asr, Maghrib, Isha) – Sri Lanka Salah Times`;
+  const description = isSriLankaSlug
+    ? "Today's Islamic prayer times for Sri Lanka (Fajr, Dhuhr, Asr, Maghrib, Isha), with a full monthly timetable by district."
+    : `Today's Islamic prayer times (Fajr, Dhuhr, Asr, Maghrib, Isha) for ${districtName}, Sri Lanka, plus a full monthly timetable.`;
   const url = `${siteConfig.baseUrl}/${slug}`;
 
   return {
@@ -56,7 +63,10 @@ export default async function DistrictPage({ params }: PageProps) {
     redirect("/");
   }
   const urlPart = slug.slice(0, -PRAYER_TIMES_SUFFIX.length);
-  const initialDistrictName = slugToDistrictDisplayName(urlPart);
+  const initialDistrictName =
+    urlPart.toLowerCase() === "sri-lanka"
+      ? "Colombo"
+      : slugToDistrictDisplayName(urlPart);
 
   const { data, districts } = await getPrayerTimesData();
 

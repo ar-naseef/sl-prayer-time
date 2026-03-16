@@ -127,15 +127,18 @@ export default function PrayerTimesClient({
     [],
   );
 
-  // Restore cached location when user lands on / (no district in URL)
+  // When landing on /: use cached location if valid, otherwise redirect to /sri-lanka-prayer-times
   useEffect(() => {
     if (!districts.length || initialRegionSlug != null) return;
     const cached = getCachedLocation();
-    if (!cached) return;
-    const valid = districts.some((d) => d.value === cached.regionSlug);
-    if (valid) {
-      router.replace(districtNameToPath(cached.districtName));
+    if (cached) {
+      const valid = districts.some((d) => d.value === cached.regionSlug);
+      if (valid) {
+        router.replace(districtNameToPath(cached.districtName));
+        return;
+      }
     }
+    router.replace("/sri-lanka-prayer-times");
   }, [districts, initialRegionSlug, router]);
 
   // Sync server-passed initial selection when districts are ready
@@ -301,7 +304,13 @@ export default function PrayerTimesClient({
 
           {districtData && !isLoading && (
             <div className="mt-8 flex flex-col gap-8">
-              {todayData && <TodayHighlight prayerTimes={todayData} />}
+              {todayData && (
+                <TodayHighlight
+                  prayerTimes={todayData}
+                  heading={selectedDistrictName || initialDistrictName || "Sri Lanka"}
+                  districtName={selectedDistrictName || initialDistrictName || "Sri Lanka"}
+                />
+              )}
               <MonthlyView
                 data={monthData}
                 district={selectedDistrict}

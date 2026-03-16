@@ -25,6 +25,7 @@ const PRAYER_TIMES_SUFFIX = "-prayer-times";
  * Enables /kegalle-prayer-times and /ratnapura-prayer-times etc.
  */
 export const SLUG_ALIASES: Record<string, string> = {
+  "sri-lanka": "colombo-gampaha-kalutara",
   kegalle: "ratnapura-kegalle",
   ratnapura: "ratnapura-kegalle",
   colombo: "colombo-gampaha-kalutara",
