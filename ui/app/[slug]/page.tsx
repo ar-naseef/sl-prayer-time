@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { redirect } from "next/navigation";
 import {
   resolveSlugFromUrl,
@@ -31,18 +32,23 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     ? "Sri Lanka Prayer Times Today (Fajr, Dhuhr, Asr, Maghrib, Isha) – Sri Lanka Salah Times"
     : `${districtName} Prayer Times Today (Fajr, Dhuhr, Asr, Maghrib, Isha) – Sri Lanka Salah Times`;
   const description = isSriLankaSlug
-    ? "Today's Islamic prayer times for Sri Lanka (Fajr, Dhuhr, Asr, Maghrib, Isha), with a full monthly timetable by district."
-    : `Today's Islamic prayer times (Fajr, Dhuhr, Asr, Maghrib, Isha) for ${districtName}, Sri Lanka, plus a full monthly timetable.`;
+    ? "Check today's prayer times in Sri Lanka by location. View Fajr, Sunrise, Dhuhr, Asr, Maghrib, and Isha times based on ACJU prayer times, with easy access to daily and monthly schedules."
+    : `Check today's prayer times in ${districtName}, Sri Lanka. View Fajr, Sunrise, Dhuhr, Asr, Maghrib, and Isha times based on ACJU prayer times, plus the monthly prayer timetable for ${districtName}.`;
   const url = `${siteConfig.baseUrl}/${slug}`;
 
   return {
     title,
     description,
     openGraph: {
-      title,
-      description,
+      title: isSriLankaSlug
+        ? "Sri Lanka Prayer Times Today"
+        : `${districtName} Prayer Times Today`,
+      description: isSriLankaSlug
+        ? "Check today's prayer times in Sri Lanka by location, including Fajr, Dhuhr, Asr, Maghrib, and Isha times."
+        : `View today's Fajr, Dhuhr, Asr, Maghrib, and Isha times for ${districtName}, Sri Lanka.`,
       url,
       type: "website",
+      siteName: "Sri Lanka Salah Times",
     },
     twitter: {
       card: "summary_large_image",
@@ -63,19 +69,54 @@ export default async function DistrictPage({ params }: PageProps) {
     redirect("/");
   }
   const urlPart = slug.slice(0, -PRAYER_TIMES_SUFFIX.length);
-  const initialDistrictName =
-    urlPart.toLowerCase() === "sri-lanka"
-      ? "Colombo"
-      : slugToDistrictDisplayName(urlPart);
+  const isSriLankaSlug = urlPart.toLowerCase() === "sri-lanka";
+  const initialDistrictName = isSriLankaSlug
+    ? "Colombo"
+    : slugToDistrictDisplayName(urlPart);
 
   const { data, districts } = await getPrayerTimesData();
 
-  return (
+  const page = (
     <PrayerTimesClient
       initialData={data}
       initialDistricts={districts}
       initialRegionSlug={regionSlug}
       initialDistrictName={initialDistrictName}
     />
+  );
+
+  if (!isSriLankaSlug) return page;
+
+  return (
+    <>
+      <Script
+        id="structured-data-website-home"
+        type="application/ld+json"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            name: siteConfig.name,
+            url: siteConfig.baseUrl,
+          }),
+        }}
+      />
+      <Script
+        id="structured-data-organization-home"
+        type="application/ld+json"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            name: siteConfig.name,
+            url: siteConfig.baseUrl,
+            logo: `${siteConfig.baseUrl}/icon.png`,
+          }),
+        }}
+      />
+      {page}
+    </>
   );
 }
