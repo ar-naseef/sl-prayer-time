@@ -110,8 +110,12 @@ export default function PrayerTimesClient({
   initialDistrictName,
 }: PrayerTimesClientProps) {
   const router = useRouter();
-  const [selectedDistrict, setSelectedDistrict] = useState<string>("");
-  const [selectedDistrictName, setSelectedDistrictName] = useState<string>("");
+  const [selectedDistrict, setSelectedDistrict] = useState<string>(
+    () => initialRegionSlug ?? "",
+  );
+  const [selectedDistrictName, setSelectedDistrictName] = useState<string>(
+    () => initialDistrictName ?? "",
+  );
   const [selectedMonthIndex, setSelectedMonthIndex] = useState(() =>
     new Date().getMonth(),
   );
